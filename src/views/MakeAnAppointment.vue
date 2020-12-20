@@ -13,9 +13,7 @@
         <tr>
           <td>Doktor</td>
           <td>
-            {{
-              doctors.filter(x => x.item == appointmentData.doctor_id)[0].name
-            }}
+            {{ selectedDoctor ? selectedDoctor.name : "" }}
           </td>
         </tr>
         <tr>
@@ -143,9 +141,7 @@
         <tr>
           <td>Doktor</td>
           <td>
-            {{
-              doctors.filter(x => x.item == appointmentData.doctor_id)[0].name
-            }}
+            {{ selectedDoctor ? selectedDoctor.name : "" }}
           </td>
         </tr>
         <tr>
@@ -214,6 +210,14 @@ export default {
   computed: {
     ...mapGetters(["me"]),
     ...mapState(["doctors", "addedAppointment", "clinics"]),
+    selectedDoctor() {
+      const filteredDoctors = this.doctors.filter(
+        x => x.item == this.appointmentData.doctor_id
+      );
+      if (filteredDoctors.length > 0) {
+        return filteredDoctors[0];
+      } else return null;
+    },
     doctors() {
       return this.clinics
         .filter(c => c.clinic_id === this.appointmentData.clinic_id)
