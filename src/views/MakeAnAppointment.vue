@@ -12,7 +12,11 @@
       <table class="apply-app w-100">
         <tr>
           <td>Doktor</td>
-          <td>Prof. Dr. İrem Ekser</td>
+          <td>
+            {{
+              doctors.filter(x => x.item == appointmentData.doctor_id)[0].name
+            }}
+          </td>
         </tr>
         <tr>
           <td>Tarih</td>
@@ -138,7 +142,11 @@
       <table class="m-1 apply-app w-100">
         <tr>
           <td>Doktor</td>
-          <td>Prof. Dr. İrem Ekser</td>
+          <td>
+            {{
+              doctors.filter(x => x.item == appointmentData.doctor_id)[0].name
+            }}
+          </td>
         </tr>
         <tr>
           <td>Tarih</td>
