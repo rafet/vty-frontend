@@ -116,8 +116,8 @@
             <li v-for="(disease, index) in diseases" :key="index">
               <div style="flex:1">
                 <div class="name-date">
-                  <h6>{{ disease.name }}</h6>
-                  <p>{{ disease.date }}</p>
+                  <h6>{{ disease.diseases_name }}</h6>
+                  <!-- <p>{{ disease.date }}</p> -->
                 </div>
               </div>
             </li>
@@ -128,7 +128,7 @@
   </div>
 </template>
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapGetters, mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -152,24 +152,17 @@ export default {
       //     done: false
       //   }
       // ],
-      diseases: [
-        {
-          name: "Kas ağrısı",
-          date: "03.07.2020"
-        },
-        {
-          name: "COVID-19",
-          date: "06.07.2020"
-        }
-      ],
+
       isDeleteAppointment: null
     };
   },
-  created() {
-    this.getMyAppointments();
+  async created() {
+    await this.getMyAppointments();
+    await this.getMyDiseases();
   },
   computed: {
-    ...mapState(["me", "appointments"]),
+    ...mapGetters(["me"]),
+    ...mapState(["appointments", "diseases"]),
     closeAppointment() {
       return this.appointments.filter(app => {
         let d = new Date(app.appointment_date).getTime();
@@ -218,7 +211,7 @@ export default {
       var year = date.getFullYear();
       return `${day} ${monthNames[monthIndex]} ${year} ${t.substring(0, 5)}`;
     },
-    ...mapActions(["getMyAppointments", "cancelAppointment"]),
+    ...mapActions(["getMyAppointments", "cancelAppointment", "getMyDiseases"]),
     deleteAppointment(_id) {
       console.log("sadf");
       this.isDeleteAppointment = "";
