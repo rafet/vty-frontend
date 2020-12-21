@@ -21,6 +21,20 @@
         </router-link>
       </p>
     </div>
+    <div style="margin-left:35px">
+      <b-row>
+        <b-col class="info-box" cols="3">
+          <i class="fas fa-weight"></i>
+          <h4>Vücut Kitle Endeksi</h4>
+          <h6>{{ vke }}</h6>
+          <p v-if="vke <= 18.5">Zayıf</p>
+          <p v-else-if="vke <= 24.9">Normal kilolu</p>
+          <p v-else-if="vke <= 29.9">Fazla kilolu</p>
+          <p v-else-if="vke <= 39.9">Obez</p>
+          <p v-else-if="vke >= 40">İleri derecede obez</p>
+        </b-col>
+      </b-row>
+    </div>
     <center
       v-if="
         closeAppointment.length > 0 &&
@@ -97,12 +111,18 @@
 
               <div style="flex:1">
                 <div class="name-date">
-                  <h6>{{ app.name + " " + app.surname }}</h6>
+                  <h6>
+                    <i class="fas fa-user-md"></i>
+                    {{ app.name + " " + app.surname }}
+                  </h6>
                   <p>
                     {{ formatDate(app.appointment_date, app.appointment_time) }}
                   </p>
                 </div>
-                <p>{{ app.clinic_name }}</p>
+                <p>
+                  <i class="fas fa-clinic-medical"></i>
+                  {{ app.clinic_name }}
+                </p>
               </div>
             </li>
           </ul>
@@ -170,6 +190,12 @@ export default {
   computed: {
     ...mapGetters(["me"]),
     ...mapState(["appointments", "diseases"]),
+    vke() {
+      return (
+        this.me.weight /
+        ((this.me.height / 100) * (this.me.height / 100))
+      ).toFixed(2);
+    },
     closeAppointment() {
       return this.appointments.filter(app => {
         let d = new Date(app.appointment_date).getTime();
@@ -365,5 +391,28 @@ export default {
 }
 .coming-appointment button {
   margin-left: 12px;
+}
+
+.info-box {
+  background: #00cec9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgb(0, 0, 0, 0.2);
+  padding: 16px;
+  color: white;
+  cursor: default;
+  overflow: hidden;
+}
+.info-box h4 {
+  font-weight: 800;
+}
+.info-box p {
+  font-weight: 800;
+}
+.info-box i {
+  position: absolute;
+  font-size: 100px;
+  left: -10px;
+  top: -10px;
+  opacity: 0.4;
 }
 </style>
