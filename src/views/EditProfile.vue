@@ -7,77 +7,87 @@
     >
 
     <hr />
+
     <b-form-group label-cols="2" label-align="right" label="Tc Kimlik:">
-      <b-form-input v-model="registerData.tc" required></b-form-input>
+      <b-form-input v-model="tc_no" required></b-form-input>
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="Adınız:">
-      <b-form-input v-model="registerData.name" required></b-form-input>
+      <b-form-input v-model="meCopy.name" required></b-form-input>
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="Soyadınız:">
-      <b-form-input v-model="registerData.surname" required></b-form-input>
+      <b-form-input v-model="meCopy.surname" required></b-form-input>
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="Telefon numaranız:">
-      <b-form-input v-model="registerData.mobile" required></b-form-input>
+      <b-form-input v-model="meCopy.phone_number" required></b-form-input>
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="E-mail adresiniz:">
-      <b-form-input v-model="registerData.email" required></b-form-input>
+      <b-form-input v-model="meCopy.email" required></b-form-input>
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="E-mail adresiniz:">
-      <b-form-input v-model="registerData.location" required></b-form-input>
+      <b-form-input v-model="meCopy.location" required></b-form-input>
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="Doğum Tarihiniz:">
-      <b-form-datepicker v-model="registerData.birthdate"></b-form-datepicker>
+      <b-form-datepicker v-model="meCopy.birth_date"></b-form-datepicker>
     </b-form-group>
-
     <b-form-group label-cols="2" label-align="right" label="Cinsiyetiniz:">
-      <b-form-radio
-        v-model="registerData.gender"
-        :aria-describedby="ariaDescribedby"
-        name="some-radios"
-        value="male"
+      <b-form-radio v-model="meCopy.gender" name="some-radios" value="male"
         >Erkek</b-form-radio
       >
-      <b-form-radio
-        v-model="registerData.gender"
-        :aria-describedby="ariaDescribedby"
-        name="some-radios"
-        value="female"
+      <b-form-radio v-model="meCopy.gender" name="some-radios" value="female"
         >Kadın</b-form-radio
       >
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="Boyunuz:">
       <b-form-input
         type="number"
-        v-model="registerData.tc"
+        v-model="meCopy.height"
         required
       ></b-form-input>
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="Kilonuz:">
       <b-form-input
         type="number"
-        v-model="registerData.tc"
+        v-model="meCopy.weight"
         required
       ></b-form-input>
     </b-form-group>
     <center>
-      <b-button variant="success" pill>Kaydet</b-button>
+      <b-overlay :show="loading">
+        <b-button variant="success" @click="clickSave" pill>Kaydet</b-button>
+      </b-overlay>
     </center>
   </div>
 </template>
 <script>
+import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
     return {
-      registerData: {
-        tc: null,
-        email: null,
-        password: null,
-        password2: null,
-        mobile: null,
-        gender: "male",
-        birthdate: null
-      }
+      meCopy: null,
+      loading: false
     };
+  },
+  computed: {
+    ...mapGetters(["me", "tc_no"]),
+    changes() {
+      return Object.entries(this.meCopy)
+        .filter(([key, val]) => this.me[key] !== val)
+        .reduce((accum, [k, v]) => {
+          accum[k] = v;
+          return accum;
+        }, {});
+    }
+  },
+  methods: {
+    ...mapActions(["updatePerson"]),
+    async clickSave() {
+      this.loading = true;
+      await this.updatePerson(this.changes);
+      this.loading = false;
+    }
+  },
+  created() {
+    this.meCopy = { ...this.me };
   }
 };
 </script>
