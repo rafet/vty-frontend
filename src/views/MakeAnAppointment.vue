@@ -89,7 +89,6 @@
           disabled-field="notEnabled"
         ></b-form-select>
       </b-form-group> -->
-
       <b-form-group label-cols="2" label-align="right" label="Tarih">
         <b-form-datepicker
           :min="minDate"
@@ -107,8 +106,17 @@
             :style="{ background: selectedHourIndex === index ? 'green' : '' }"
             :class="{
               disabled:
-                isToday(appointmentData.appointment_date) &&
-                new Date().getHours() > item
+                (isToday(appointmentData.appointment_date) &&
+                  new Date().getHours() > item) ||
+                (busyDates &&
+                  busyDates.filter(
+                    bd =>
+                      areSameDate(
+                        bd.appointment_date,
+                        appointmentData.appointment_date
+                      ) &&
+                      parseInt(bd.appointment_time.substring(0, 2)) === item
+                  ).length > 0)
             }"
           >
             {{ item }}:00
@@ -223,7 +231,8 @@ export default {
         clinic_id: null
       },
       successful: undefined,
-      minDate
+      minDate,
+      busyDates: null
     };
   },
   async created() {
@@ -252,13 +261,27 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["getDoctors", "makeApoointment", "getClinics"]),
+    ...mapActions([
+      "getDoctors",
+      "makeApoointment",
+      "getClinics",
+      "getBusyDates"
+    ]),
     showApplyModal() {
       this.$bvModal.show("apply-appointment");
     },
     isToday(d) {
       const now = new Date();
       const date = new Date(d);
+      return (
+        now.getDate() === date.getDate() &&
+        now.getMonth() === date.getMonth() &&
+        now.getFullYear() === date.getFullYear()
+      );
+    },
+    areSameDate(d1, d2) {
+      const now = new Date(d1);
+      const date = new Date(d2);
       return (
         now.getDate() === date.getDate() &&
         now.getMonth() === date.getMonth() &&
@@ -277,6 +300,9 @@ export default {
     selectedHourIndex() {
       this.appointmentData.appointment_time =
         this.hours[this.selectedHourIndex] + ":00";
+    },
+    async "appointmentData.doctor_id"(newVal) {
+      this.busyDates = await this.getBusyDates(newVal);
     }
   }
 };
