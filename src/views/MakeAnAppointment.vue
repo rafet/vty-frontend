@@ -92,6 +92,7 @@
 
       <b-form-group label-cols="2" label-align="right" label="Tarih">
         <b-form-datepicker
+          :min="minDate"
           required
           v-model="appointmentData.appointment_date"
           class="mb-2"
@@ -104,6 +105,11 @@
             v-for="(item, index) in hours"
             :key="index"
             :style="{ background: selectedHourIndex === index ? 'green' : '' }"
+            :class="{
+              disabled:
+                isToday(appointmentData.appointment_date) &&
+                new Date().getHours() > item
+            }"
           >
             {{ item }}:00
           </span>
@@ -122,7 +128,20 @@
       </b-form-group>
       <b-form-group label-align="right" label="">
         <center>
-          <b-button type="submit" pill variant="success">Randevu Al</b-button>
+          <b-button
+            :disabled="
+              !selectedHourIndex ||
+                !appointmentData.doctor_id ||
+                !appointmentData.appointment_date ||
+                !appointmentData.appointment_time ||
+                !appointmentData.loc ||
+                !appointmentData.clinic_id
+            "
+            type="submit"
+            pill
+            variant="success"
+            >Randevu Al</b-button
+          >
         </center>
       </b-form-group>
     </b-form>
@@ -188,9 +207,13 @@
 import { mapActions, mapState, mapGetters } from "vuex";
 export default {
   data() {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const minDate = new Date(today);
+
     return {
       hours: [9, 10, 11, 13, 14, 15, 16],
-      selectedHourIndex: 2,
+      selectedHourIndex: null,
       appointmentData: {
         doctor_id: null,
         appointment_date: null,
@@ -199,7 +222,8 @@ export default {
         description: " ",
         clinic_id: null
       },
-      successful: undefined
+      successful: undefined,
+      minDate
     };
   },
   async created() {
@@ -210,6 +234,7 @@ export default {
   computed: {
     ...mapGetters(["me"]),
     ...mapState(["doctors", "addedAppointment", "clinics"]),
+
     selectedDoctor() {
       const filteredDoctors = this.doctors.filter(
         x => x.item == this.appointmentData.doctor_id
@@ -231,12 +256,21 @@ export default {
     showApplyModal() {
       this.$bvModal.show("apply-appointment");
     },
+    isToday(d) {
+      const now = new Date();
+      const date = new Date(d);
+      return (
+        now.getDate() === date.getDate() &&
+        now.getMonth() === date.getMonth() &&
+        now.getFullYear() === date.getFullYear()
+      );
+    },
     makeApp() {
       this.appointmentData.appointment_time =
         this.hours[this.selectedHourIndex] + ":00";
       this.makeApoointment(this.appointmentData);
 
-      // this.successful = true;
+      this.successful = true;
     }
   },
   watch: {
@@ -277,5 +311,9 @@ h2 {
 .apply-app tr :first-child {
   width: 200px;
   font-weight: 700;
+}
+.disabled {
+  background: #bbb !important;
+  cursor: not-allowed !important;
 }
 </style>
