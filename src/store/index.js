@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import API from "../axios";
+import VueJwtDecode from "vue-jwt-decode";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -16,7 +17,7 @@ export default new Vuex.Store({
   },
   getters: {
     tc_no() {
-      return Vue.ls.get("person").tc_no;
+      return VueJwtDecode.decode(Vue.ls.get("token")).tc_no;
     },
     patient_id() {
       return Vue.ls.get("person").patient_id;
@@ -40,6 +41,7 @@ export default new Vuex.Store({
     },
     SET_ME(state, me) {
       state.me = me;
+      Vue.ls.set("person", me);
     },
     SET_MY_APPOINTMENTS(state, appointments) {
       state.appointments = appointments;
@@ -160,12 +162,20 @@ export default new Vuex.Store({
       });
       dispatch("getMyDiseases");
     },
+    updatePerson: async ({ getters }, payload) => {
+      await API.put(`/person/${getters.tc_no}`, { ...payload });
+    },
     deleteMyDisease: async ({ commit, getters }, diseases_id) => {
       await API.delete(
         `/have-diseases/?diseases_id=${diseases_id}&patient_id=${getters.patient_id}`
       );
       commit("DELETE_DISEASES", diseases_id);
     },
+    getBusyDates: async (_, doctor_id) => {
+      const res = await API.get(`/doctor/${doctor_id}/busy`);
+      return res.data.appointment;
+    },
+
     logOut() {
       Vue.ls.clear();
       window.location.href = "/login";
