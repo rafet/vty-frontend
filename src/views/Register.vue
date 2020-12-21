@@ -158,8 +158,13 @@ export default {
           );
           this.loadingLocation = false;
         },
-        error => {
-          console.log(error.message);
+        () => {
+          this.$bvToast.toast("Konum erişimine izin vermelisiniz", {
+            title: `Konum izni`,
+            variant: "danger",
+            solid: true
+          });
+          this.loadingLocation = false;
         }
       );
     },
@@ -177,7 +182,8 @@ export default {
           this.registerData.location = data.results[0].formatted_address;
         }
       } catch (error) {
-        console.log(error.message);
+        console.log("..", error.message);
+        this.loadingLocation = false;
       }
     }
   }
