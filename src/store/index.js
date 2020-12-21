@@ -58,6 +58,11 @@ export default new Vuex.Store({
     },
     DELETE_DISEASES(state, disease_id) {
       state.diseases = state.diseases.filter(x => x.diseases_id !== disease_id);
+    },
+    CANCEL_APPOINTMENT(state, appointment_id) {
+      state.appointments.forEach(x => {
+        if (x.appointment_id === appointment_id) x.is_cancelled = true;
+      });
     }
   },
   actions: {
@@ -138,10 +143,11 @@ export default new Vuex.Store({
       const res = await API.get(`/have-diseases/?tc_no=${getters.tc_no}`);
       commit("SET_MY_DISEASES", res.data);
     },
-    cancelAppointment: async (_, payload) => {
+    cancelAppointment: async ({ commit }, payload) => {
       await API.put(`/appointment/${payload.appointment_id}/cancel`, {
         is_cancelled: true
       });
+      commit("CANCEL_APPOINTMENT", payload.appointment_id);
     },
     getAllDiseases: async ({ commit }) => {
       const res = await API.get(`/diseases/`);

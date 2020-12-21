@@ -10,13 +10,21 @@
     </h2>
     <b-table striped hover :items="rows" :fields="fields">
       <template #cell(actions)="row">
+        <span v-if="row.item.isPast && !row.item.is_cancelled">
+          Tamamlandı
+        </span>
+        <span v-else-if="row.item.is_cancelled">
+          İptal Edildi
+        </span>
         <b-button
-          v-if="!row.isPast"
           pill
+          v-else-if="!row.item.is_cancelled && !row.item.isPast"
           variant="danger"
-          @click="cancelAppointment(row.appointment_id)"
+          @click="
+            clickCancelAppointment({ appointment_id: row.item.appointment_id })
+          "
           size="sm"
-          >İptal et</b-button
+          >İptal Et</b-button
         >
       </template>
     </b-table>
@@ -67,7 +75,30 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["getMyAppointments"]),
+    ...mapActions(["getMyAppointments", "cancelAppointment"]),
+    clickCancelAppointment(payload) {
+      this.$bvModal
+        .msgBoxConfirm("Randevunuzu iptal etmek istediğinize emin misiniz?", {
+          title: "Doğrulayın",
+          size: "sm",
+          buttonSize: "sm",
+          okVariant: "danger",
+          okTitle: "Evet",
+          cancelTitle: "Hayır",
+          footerClass: "p-2",
+          cancelVariant: "link",
+          hideHeaderClose: false,
+          centered: true
+        })
+        .then(async value => {
+          if (value) {
+            await this.cancelAppointment(payload);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     formatDate: (d, t) => {
       var monthNames = [
         "Ocak",
@@ -97,11 +128,14 @@ export default {
     rows() {
       return this.appointments.map(a => {
         return {
+          appointment_id: a.appointment_id,
           name: a.name + " " + a.surname,
           clinic_name: a.clinic_name,
           date: this.formatDate(a.appointment_date, a.appointment_time),
           location: a.location,
-          description: a.description
+          description: a.description,
+          isPast: a.isPast,
+          is_cancelled: a.is_cancelled
         };
       });
     },
