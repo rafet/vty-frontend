@@ -1,7 +1,14 @@
 <template>
   <div class="profile">
     <img class="cover w-100" src="../assets/profile-bg.jpeg" alt="" />
-    <img class="avatar" src="../assets/avatar.png" alt="" />
+
+    <img
+      class="avatar"
+      v-if="me.gender === 'male'"
+      src="../assets/man.png"
+      alt=""
+    />
+    <img class="avatar" v-else src="../assets/woman.png" alt="" />
     <div class="user-name">
       <p class="name">{{ me.name + " " + me.surname }}</p>
       <p class="body">
@@ -213,7 +220,6 @@ export default {
     },
     ...mapActions(["getMyAppointments", "cancelAppointment", "getMyDiseases"]),
     deleteAppointment(_id) {
-      console.log("sadf");
       this.isDeleteAppointment = "";
       this.$bvModal
         .msgBoxConfirm("Randevunuzu iptal etmek istediğinize emin misiniz?", {
@@ -257,6 +263,7 @@ export default {
   margin-top: -75px;
   margin-left: 35px;
   border: 7px solid white;
+  background: white;
 }
 .profile .user-name {
   margin-left: 6px;
