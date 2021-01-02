@@ -30,10 +30,10 @@
       <b-form-datepicker v-model="meCopy.birth_date"></b-form-datepicker>
     </b-form-group>
     <b-form-group label-cols="2" label-align="right" label="Cinsiyetiniz:">
-      <b-form-radio v-model="meCopy.gender" name="some-radios" value="male"
+      <b-form-radio v-model="meCopy.gender" name="some-radios" value="Erkek"
         >Erkek</b-form-radio
       >
-      <b-form-radio v-model="meCopy.gender" name="some-radios" value="female"
+      <b-form-radio v-model="meCopy.gender" name="some-radios" value="Kadın"
         >Kadın</b-form-radio
       >
     </b-form-group>

@@ -58,14 +58,14 @@
             v-model="registerData.gender"
             :aria-describedby="ariaDescribedby"
             name="some-radios"
-            value="male"
+            value="Erkek"
             >Erkek</b-form-radio
           >
           <b-form-radio
             v-model="registerData.gender"
             :aria-describedby="ariaDescribedby"
             name="some-radios"
-            value="female"
+            value="Kadın"
             >Kadın</b-form-radio
           >
         </b-form-group>
@@ -131,7 +131,7 @@ export default {
         password: null,
         password2: null,
         phone_number: null,
-        gender: "male",
+        gender: "Erkek",
         height: null,
         weight: null,
         birth_date: null,

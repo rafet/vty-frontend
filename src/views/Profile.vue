@@ -4,7 +4,7 @@
 
     <img
       class="avatar"
-      v-if="me.gender === 'male'"
+      v-if="me.gender === 'Erkek'"
       src="../assets/man.png"
       alt=""
     />
