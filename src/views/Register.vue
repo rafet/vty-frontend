@@ -108,6 +108,12 @@
             KVKK koşullarını okudum ve kabul ediyorum.
           </b-form-checkbox>
         </b-form-group>
+        <b-form-group>
+          <b-alert :show="error" variant="danger"
+            >Bu TC Kimlik numarasına ait bir kayıt bulunmaktadır. Lütfen
+            bilgilerinizi kontol edip bir daha deneyin;</b-alert
+          >
+        </b-form-group>
         <b-button type="submit" class="mr-2" :disabled="!kvkk" variant="primary"
           >Kaydol</b-button
         >
@@ -134,7 +140,8 @@ export default {
         weight: null,
         birth_date: null,
         location: null
-      }
+      },
+      error: false
     };
   },
   methods: {
@@ -144,7 +151,7 @@ export default {
         await this.register(this.registerData);
         window.location.href = "/profile";
       } catch (error) {
-        console.log(error);
+        this.error = true;
       }
     },
     locatorButtonPressed() {

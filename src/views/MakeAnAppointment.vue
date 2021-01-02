@@ -90,8 +90,8 @@
         ></b-form-select>
       </b-form-group> -->
       <b-form-group label-cols="2" label-align="right" label="Tarih">
+        <!-- :min="minDate" -->
         <b-form-datepicker
-          :min="minDate"
           required
           v-model="appointmentData.appointment_date"
           class="mb-2"
@@ -288,12 +288,22 @@ export default {
         now.getFullYear() === date.getFullYear()
       );
     },
-    makeApp() {
+    async makeApp() {
       this.appointmentData.appointment_time =
         this.hours[this.selectedHourIndex] + ":00";
-      this.makeApoointment(this.appointmentData);
-
-      this.successful = true;
+      try {
+        await this.makeApoointment(this.appointmentData);
+        this.successful = true;
+      } catch (error) {
+        console.log(error.data.message);
+        this.successful = false;
+        this.$bvToast.toast(error.data.message, {
+          title: `Randevu alınamadı!`,
+          toaster: "b-toaster-top-center",
+          variant: "danger",
+          solid: true
+        });
+      }
     }
   },
   watch: {

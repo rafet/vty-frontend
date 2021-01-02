@@ -8,6 +8,7 @@ import EditProfile from "../views/EditProfile.vue";
 import MakeAnAppointment from "../views/MakeAnAppointment.vue";
 import MyAppointments from "../views/MyAppointments.vue";
 import MyDiseases from "../views/MyDiseases.vue";
+import Admin from "../views/Admin.vue";
 import VueJwtDecode from "vue-jwt-decode";
 Vue.use(VueRouter);
 
@@ -122,6 +123,16 @@ const routes = [
     path: "/my-diseases",
     name: "MyDiseases",
     component: MyDiseases,
+    beforeEnter: ifAuthenticated,
+    meta: {
+      layout: "default",
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/admin",
+    name: "Admin",
+    component: Admin,
     beforeEnter: ifAuthenticated,
     meta: {
       layout: "default",

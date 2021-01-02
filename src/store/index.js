@@ -13,7 +13,8 @@ export default new Vuex.Store({
     addedAppointment: null,
     clinics: [],
     diseases: null,
-    allDiseases: null
+    allDiseases: null,
+    hospitals: null
   },
   getters: {
     tc_no() {
@@ -65,6 +66,9 @@ export default new Vuex.Store({
       state.appointments.forEach(x => {
         if (x.appointment_id === appointment_id) x.is_cancelled = true;
       });
+    },
+    SET_HOSPITALS(state, hospitals) {
+      state.hospitals = hospitals;
     }
   },
   actions: {
@@ -90,7 +94,57 @@ export default new Vuex.Store({
     getDoctors: async ({ commit }) => {
       try {
         const res = await API.get("/doctor/");
+
         commit("SET_DOCTORS", res.data);
+      } catch (error) {
+        return Promise.reject(error.response);
+      }
+    },
+    getDoctorsByHospitalId: async ({ commit }, hospital_id) => {
+      try {
+        const res = await API.get("/doctor/?hospital_id=" + hospital_id);
+
+        commit(
+          "SET_DOCTORS",
+          res.data.map(doc => {
+            const user = doc.fonksiyon2
+              .substring(1, doc.fonksiyon2.length - 2)
+              .split(",");
+            return {
+              name: user[0],
+              surname: user[1],
+              salary: user[2]
+            };
+          })
+        );
+      } catch (error) {
+        return Promise.reject(error.response);
+      }
+    },
+    getDoctorsByClinicId: async ({ commit }, clinic_id) => {
+      try {
+        const res = await API.get("/doctor/?clinic_id=" + clinic_id);
+        commit(
+          "SET_DOCTORS",
+          res.data.map(doc => {
+            const user = doc.fonksiyon
+              .substring(1, doc.fonksiyon.length - 2)
+              .split(",");
+            return {
+              name: user[0],
+              surname: user[1],
+              salary: user[2]
+            };
+          })
+        );
+      } catch (error) {
+        return Promise.reject(error.response);
+      }
+    },
+    getHospitals: async ({ commit }) => {
+      try {
+        const res = await API.get("/hospital/");
+        commit("SET_HOSPITALS", res.data);
       } catch (error) {
         return Promise.reject(error.response);
       }
@@ -107,7 +161,7 @@ export default new Vuex.Store({
     getMyAppointments: async ({ commit, getters }) => {
       try {
         const res = await API.get(`/appointment/?tc_no=${getters.tc_no}`);
-        const appointments = res.data.appointments.map(x => {
+        const appointments = res.data.appointments.rows.map(x => {
           return {
             ...x,
             isPast:
@@ -142,8 +196,20 @@ export default new Vuex.Store({
       }
     },
     getMyDiseases: async ({ commit, getters }) => {
-      const res = await API.get(`/have-diseases/?tc_no=${getters.tc_no}`);
-      commit("SET_MY_DISEASES", res.data);
+      try {
+        const res = await API.get(`/have-diseases/?tc_no=${getters.tc_no}`);
+        commit("SET_MY_DISEASES", res.data);
+      } catch (error) {
+        return Promise.reject(error.response);
+      }
+    },
+    getDiseaseCounts: async (_, count) => {
+      try {
+        const res = await API.get(`/patient/disease-count?count=${count}`);
+        return res.data;
+      } catch (error) {
+        return Promise.reject(error.response);
+      }
     },
     cancelAppointment: async ({ commit }, payload) => {
       await API.put(`/appointment/${payload.appointment_id}/cancel`, {
@@ -175,7 +241,11 @@ export default new Vuex.Store({
       const res = await API.get(`/doctor/${doctor_id}/busy`);
       return res.data.appointment;
     },
-
+    getAppCounts: async () => {
+      const res = await API.get(`/patient/app-count`);
+      console.log(res.data);
+      return res.data;
+    },
     logOut() {
       Vue.ls.clear();
       window.location.href = "/login";

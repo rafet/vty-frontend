@@ -13,13 +13,9 @@
             required
             v-model="diseases_id"
             :options="
-              allDiseases
-                .filter(
-                  x => !diseases.map(d => d.diseases_id).includes(x.diseases_id)
-                )
-                .map(c => {
-                  return { name: `${c.diseases_name}`, item: c.diseases_id };
-                })
+              allDiseases.map(c => {
+                return { name: `${c.diseases_name}`, item: c.diseases_id };
+              })
             "
             class="mb-3"
             value-field="item"
@@ -84,9 +80,17 @@ export default {
       "deleteMyDisease"
     ]),
     async addDis() {
-      await this.addMyDiseases(this.diseases_id);
-
-      this.$bvModal.hide("add-disease-modal");
+      try {
+        await this.addMyDiseases(this.diseases_id);
+        this.$bvModal.hide("add-disease-modal");
+      } catch (error) {
+        this.$bvToast.toast("Aynı hastalığı 2 kere ekleyemezsiniz!", {
+          title: `Hastalık eklenemedi!`,
+          toaster: "b-toaster-top-center",
+          variant: "danger",
+          solid: true
+        });
+      }
     },
     async deleteDis(_id) {
       await this.deleteMyDisease(_id);

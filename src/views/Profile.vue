@@ -33,6 +33,21 @@
           <p v-else-if="vke <= 39.9">Obez</p>
           <p v-else-if="vke >= 40">İleri derecede obez</p>
         </b-col>
+
+        <b-col
+          class="info-box ml-2 bg-dark"
+          cols="3"
+          v-if="favDoctor && this.appCounts[0].name"
+        >
+          <i class="fas fa-stethoscope"></i>
+          <h4>Favori Doktorun</h4>
+          <h6>{{ favDoctor.name }} {{ favDoctor.surname }}</h6>
+          <p class="m-0">{{ favDoctor.clinic_name }}</p>
+          <span
+            >* {{ favDoctor.name }} {{ favDoctor.surname }} ile
+            {{ favDoctor.c }} randevu gerçekleştirdin.</span
+          >
+        </b-col>
       </b-row>
     </div>
     <center
@@ -179,13 +194,14 @@ export default {
       //     done: false
       //   }
       // ],
-
+      appCounts: null,
       isDeleteAppointment: null
     };
   },
   async created() {
     await this.getMyAppointments();
     await this.getMyDiseases();
+    this.appCounts = await this.getAppCounts();
   },
   computed: {
     ...mapGetters(["me"]),
@@ -200,11 +216,26 @@ export default {
       return this.appointments.filter(app => {
         let d = new Date(app.appointment_date).getTime();
         d += parseInt(app.appointment_time.split(":")[0]) * 60 * 60 * 1000;
-        return Date.now() < d && !d.is_cancelled;
+
+        return Date.now() < d && !app.is_cancelled;
       });
     },
     pastAppointments() {
       return this.appointments.filter(x => x.isPast || x.is_cancelled);
+    },
+    favDoctor() {
+      if (this.appCounts && this.appCounts.length > 0) {
+        let maxIndex = 0,
+          max = parseInt(this.appCounts[0].c);
+        for (let i = 0; i < this.appCounts.length; i++) {
+          const element = this.appCounts[i];
+          if (parseInt(element.c) > max) {
+            max = parseInt(element.c);
+            maxIndex = i;
+          }
+        }
+        return this.appCounts[maxIndex];
+      } else return null;
     }
   },
   methods: {
@@ -244,7 +275,12 @@ export default {
       var year = date.getFullYear();
       return `${day} ${monthNames[monthIndex]} ${year} ${t.substring(0, 5)}`;
     },
-    ...mapActions(["getMyAppointments", "cancelAppointment", "getMyDiseases"]),
+    ...mapActions([
+      "getMyAppointments",
+      "cancelAppointment",
+      "getMyDiseases",
+      "getAppCounts"
+    ]),
     deleteAppointment(_id) {
       this.isDeleteAppointment = "";
       this.$bvModal
@@ -413,6 +449,9 @@ export default {
   font-size: 100px;
   left: -10px;
   top: -10px;
-  opacity: 0.4;
+  opacity: 0.25;
+}
+.info-box span {
+  font-size: 10px;
 }
 </style>
