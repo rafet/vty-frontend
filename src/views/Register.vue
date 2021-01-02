@@ -2,11 +2,7 @@
   <b-container class="d-flex  justify-content-center">
     <b-card style="width:60%" class=" p-4" title="Kaydol">
       <center>
-        <img
-          class="w-50"
-          src="https://i.sonhaberler.com/storage/old/images/upload/alo-182-mhrs-randevu.png"
-          alt=""
-        />
+        <img class="w-50" :src="require('@/assets/logo.png')" alt="" />
       </center>
       <b-form @submit.prevent="clickRegister">
         <b-form-group label="Tc Kimlik:">

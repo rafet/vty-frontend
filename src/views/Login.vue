@@ -2,11 +2,7 @@
   <b-container class="d-flex h-100 justify-content-center align-items-center">
     <b-card style="width:66%" class="p-4" title="Giriş Yap">
       <center>
-        <img
-          class="w-50"
-          src="https://i.sonhaberler.com/storage/old/images/upload/alo-182-mhrs-randevu.png"
-          alt=""
-        />
+        <img class="w-50" :src="require('@/assets/logo.png')" alt="" />
       </center>
       <b-form @submit.prevent="clickLogin">
         <b-form-group label="Tc Kimlik:">
